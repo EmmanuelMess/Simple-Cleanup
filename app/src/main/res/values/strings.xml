@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Simple Cleanup</string>
+    <string name="space_left_percentage">Space left: %d%%</string>
 </resources>

@@ -6,16 +6,20 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.emmanuelmess.simplecleanup.helpers.AsyncTaskWithCallback
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.apache.commons.io.deleteDirectory
 import java.io.File
+import kotlin.math.roundToInt
 
 class MainActivity : PermissionsActivity() {
 
     var files: List<File>? = null
     lateinit var adapter: DeleteableFileViewAdapter
+    var spaceLeftSnackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +43,12 @@ class MainActivity : PermissionsActivity() {
         filesRecyclerView.adapter = adapter
 
         refresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        refreshInternalStorageLeftSnackbar()
     }
 
     private fun refresh() {
@@ -65,6 +75,13 @@ class MainActivity : PermissionsActivity() {
             fab.hide()
             emptyState.visibility = VISIBLE
         }
+
+        if(files.isNotEmpty()) {
+            refreshInternalStorageLeftSnackbar()
+        } else {
+            spaceLeftSnackbar?.dismiss()
+            spaceLeftSnackbar = null
+        }
     }
 
     private fun delete() {
@@ -76,6 +93,20 @@ class MainActivity : PermissionsActivity() {
                 adapter.setSuccessOrFaliure(success, i)
             }
         }
+
+        refreshInternalStorageLeftSnackbar()
+    }
+
+    private fun refreshInternalStorageLeftSnackbar() {
+        val text = getString(R.string.space_left_percentage, Files.availableSpaceInternalPercentage.roundToInt())
+
+        if(spaceLeftSnackbar == null) {
+            spaceLeftSnackbar = Snackbar.make(filesRecyclerView, text, Snackbar.LENGTH_INDEFINITE)
+        } else {
+            spaceLeftSnackbar!!.setText(text)
+        }
+
+        spaceLeftSnackbar!!.show()
     }
 
     val LIST_STATE_KEY = "liststate"
