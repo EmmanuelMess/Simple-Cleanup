@@ -20,7 +20,7 @@ object Files {
         }
     }
 
-    private fun getInternalDirectory(): File {
+    fun getInternalDirectory(): File {
         return Environment.getExternalStorageDirectory().absolutePath.trimEnd('/').toFile()
     }
 

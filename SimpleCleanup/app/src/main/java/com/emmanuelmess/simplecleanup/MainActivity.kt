@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.emmanuelmess.simplecleanup.helpers.AsyncTaskWithCallback
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
+import com.emmanuelmess.simplecleanup.helpers.isStorageFragmenting
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -19,7 +19,7 @@ class MainActivity : PermissionsActivity() {
 
     var files: List<File>? = null
     lateinit var adapter: DeleteableFileViewAdapter
-    var spaceLeftSnackbar: Snackbar? = null
+    var spaceLeftSnackbar: ResetableSnackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class MainActivity : PermissionsActivity() {
         if(files.isNotEmpty()) {
             refreshInternalStorageLeftSnackbar()
         } else {
-            spaceLeftSnackbar?.dismiss()
+            spaceLeftSnackbar?.snackbar?.dismiss()
             spaceLeftSnackbar = null
         }
     }
@@ -101,12 +101,17 @@ class MainActivity : PermissionsActivity() {
         val text = getString(R.string.space_left_percentage, Files.availableSpaceInternalPercentage.roundToInt())
 
         if(spaceLeftSnackbar == null) {
-            spaceLeftSnackbar = Snackbar.make(filesRecyclerView, text, Snackbar.LENGTH_INDEFINITE)
+            spaceLeftSnackbar = ResetableSnackbar(Snackbar.make(filesRecyclerView, text, Snackbar.LENGTH_INDEFINITE))
         } else {
-            spaceLeftSnackbar!!.setText(text)
+            spaceLeftSnackbar!!.snackbar.setText(text)
+            if(isStorageFragmenting(this, Files.getInternalDirectory())) {
+                spaceLeftSnackbar!!.setColor(R.color.colorError)
+            } else {
+                spaceLeftSnackbar!!.resetColor()
+            }
         }
 
-        spaceLeftSnackbar!!.show()
+        spaceLeftSnackbar!!.snackbar.show()
     }
 
     val LIST_STATE_KEY = "liststate"
