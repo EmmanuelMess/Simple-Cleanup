@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.emmanuelmess.simplecleanup.extensions.deleteAll
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
 import com.emmanuelmess.simplecleanup.helpers.isStorageFragmenting
 import com.google.android.material.snackbar.Snackbar
@@ -17,7 +18,7 @@ import kotlin.math.roundToInt
 
 class MainActivity : PermissionsActivity() {
 
-    var files: List<File>? = null
+    var filesByCategory: List<List<File>>? = null
     lateinit var adapter: DeleteableFileViewAdapter
     var spaceLeftSnackbar: ResetableSnackbar? = null
 
@@ -57,39 +58,50 @@ class MainActivity : PermissionsActivity() {
         pullToRefresh.isRefreshing = true
 
         handlePermission(READ_EXTERNAL_STORAGE) {
-            GetDeletableFiles(this).onPostExecute { files ->
-                this@MainActivity.files = files
+            GetDeletableFiles(this).onPostExecute { files: Array<List<File>> ->
                 pullToRefresh.isRefreshing = false
-                loadFilesList()
+                loadFilesList(files)
             }.execute()
         }
     }
 
-    private fun loadFilesList() = files!!.let { files ->
-        (filesRecyclerView.adapter as DeleteableFileViewAdapter).setFiles(files)
+    private fun loadFilesList(files: Array<List<File>>) {
+        val nonEmptyCategories = files.map { it.isNotEmpty() }
+        (filesRecyclerView.adapter as DeleteableFileViewAdapter)
+            .setCategories(
+                nonEmptyCategories[0],
+                nonEmptyCategories[1],
+                nonEmptyCategories[2],
+                nonEmptyCategories[3],
+                nonEmptyCategories[4]
+            )
 
-        if(files.isNotEmpty()){
-            fab.show()
-            emptyState.visibility = GONE
-        } else {
-            fab.hide()
-            emptyState.visibility = VISIBLE
-        }
+        filesByCategory = files.filter { it.isNotEmpty() }
 
-        if(files.isNotEmpty()) {
-            refreshInternalStorageLeftSnackbar()
-        } else {
-            spaceLeftSnackbar?.snackbar?.dismiss()
-            spaceLeftSnackbar = null
+        filesByCategory!!.let { filesByCategory ->
+            if (filesByCategory.isNotEmpty()) {
+                fab.show()
+                emptyState.visibility = GONE
+            } else {
+                fab.hide()
+                emptyState.visibility = VISIBLE
+            }
+
+            if (filesByCategory.isNotEmpty()) {
+                refreshInternalStorageLeftSnackbar()
+            } else {
+                spaceLeftSnackbar?.snackbar?.dismiss()
+                spaceLeftSnackbar = null
+            }
         }
     }
 
     private fun delete() {
         fab.hide()
 
-        files?.let { files ->
+        filesByCategory?.let { files ->
             for (i in 0 until files.size) {
-                val success = deleteDirectory(files[i])
+                val success = files[i].deleteAll()
                 adapter.setSuccessOrFaliure(success, i)
             }
         }

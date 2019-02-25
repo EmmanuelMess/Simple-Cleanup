@@ -3,27 +3,45 @@ package com.emmanuelmess.simplecleanup
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.emmanuelmess.simplecleanup.FileMetadata.Companion.LAST_BACKUP
+import com.emmanuelmess.simplecleanup.FileMetadata.Companion.MEDIA
+import com.emmanuelmess.simplecleanup.FileMetadata.Companion.OLD_MEDIA
 import com.emmanuelmess.simplecleanup.extensions.let
 import kotlinx.android.synthetic.main.item_filelist.view.*
-import java.io.File
 
 class DeleteableFileViewAdapter(val context: Context): RecyclerView.Adapter<FileHolder>() {
-    private var files: List<Model> = listOf()
+    private var itemsOfList: List<Model> = listOf()
 
     init {
         setHasStableIds(false)
     }
 
-    fun setFiles(files: List<File>) {
-        this.files = files.map { Model(it, false, null) }
+    fun setCategories(
+        oldBackups: Boolean,
+        cache: Boolean,
+        lastBackup: Boolean,
+        oldMedia: Boolean,
+        media: Boolean
+    ) {
+        val items = mutableListOf<Model>()
+
+        if(oldBackups) items.add(Model(R.string.old_backup))
+        if(cache) items.add(Model(R.string.cache))
+        if(lastBackup) items.add(Model(R.string.last_backup))
+        if(oldMedia) items.add(Model(R.string.old_media))
+        if(media) items.add(Model(R.string.media))
+
+        this.itemsOfList = items
+
         notifyDataSetChanged()
     }
 
     fun setSuccessOrFaliure(success: Boolean, index: Int) {
-        files[index].finished = true
-        files[index].success = success
+        itemsOfList[index].finished = true
+        itemsOfList[index].success = success
         notifyItemChanged(index)
     }
 
@@ -33,10 +51,10 @@ class DeleteableFileViewAdapter(val context: Context): RecyclerView.Adapter<File
         return FileHolder(view as ConstraintLayout)
     }
 
-    override fun getItemCount() = files.size
+    override fun getItemCount() = itemsOfList.size
 
-    override fun onBindViewHolder(holder: FileHolder, position: Int) = files[position].let { model ->
-        holder.setFile(model.file)
+    override fun onBindViewHolder(holder: FileHolder, position: Int) = itemsOfList[position].let { model ->
+        holder.setFile(model.categoryText)
         if(!model.finished) {
             holder.setNotFinished()
         } else {
@@ -50,8 +68,8 @@ class FileHolder(
     private val layout: ConstraintLayout
 ) : RecyclerView.ViewHolder(layout) {
 
-    fun setFile(file: File) = with(layout) {
-        nameTextView.text = file.absolutePath
+    fun setFile(@StringRes categoryText: Int) = with(layout) {
+        nameTextView.setText(categoryText)
     }
 
     fun setNotFinished() = with(layout) {
@@ -64,14 +82,15 @@ class FileHolder(
     }
 }
 
-data class Model(val file: File, var finished: Boolean, var success: Boolean?) {
+data class Model(@StringRes val categoryText: Int, var finished: Boolean = false, var success: Boolean? = null) {
     override fun hashCode(): Int {
         var hash = 37
+        hash = 37 * hash + categoryText.hashCode()
         hash = 37 * hash + (if(finished) 0 else 1)
         let(success) { success ->
             hash = 37 * hash + (if(success == null || success) 0 else 1)
         }
-        return file.hashCode()
+        return hash
     }
 
     override fun equals(other: Any?): Boolean {
@@ -80,7 +99,7 @@ data class Model(val file: File, var finished: Boolean, var success: Boolean?) {
 
         other as Model
 
-        if (file != other.file) return false
+        if (categoryText != other.categoryText) return false
         if (finished != other.finished) return false
         if (success != other.success) return false
 

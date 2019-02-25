@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Simple Cleanup</string>
     <string name="space_left_percentage">Space left: %d%%</string>
+    <string name="old_media">Old media</string>
+    <string name="old_backup">Old backups</string>
+    <string name="cache">Cache</string>
+    <string name="last_backup">Last backup</string>
+    <string name="media">Media</string>
 </resources>
