@@ -7,20 +7,19 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmanuelmess.simplecleanup.extensions.deleteAll
+import com.emmanuelmess.simplecleanup.extensions.setColor
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
 import com.emmanuelmess.simplecleanup.helpers.isStorageFragmenting
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import org.apache.commons.io.deleteDirectory
 import java.io.File
-import kotlin.math.roundToInt
 
 class MainActivity : PermissionsActivity() {
 
     var filesByCategory: List<List<File>>? = null
     lateinit var adapter: DeleteableFileViewAdapter
-    var spaceLeftSnackbar: ResetableSnackbar? = null
+    var spaceLeftSnackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +89,7 @@ class MainActivity : PermissionsActivity() {
             if (filesByCategory.isNotEmpty()) {
                 refreshInternalStorageLeftSnackbar()
             } else {
-                spaceLeftSnackbar?.snackbar?.dismiss()
+                spaceLeftSnackbar?.dismiss()
                 spaceLeftSnackbar = null
             }
         }
@@ -110,20 +109,31 @@ class MainActivity : PermissionsActivity() {
     }
 
     private fun refreshInternalStorageLeftSnackbar() {
-        val text = getString(R.string.space_left_percentage, Files.availableSpaceInternalPercentage.roundToInt())
-
-        if(spaceLeftSnackbar == null) {
-            spaceLeftSnackbar = ResetableSnackbar(Snackbar.make(filesRecyclerView, text, Snackbar.LENGTH_INDEFINITE))
-        } else {
-            spaceLeftSnackbar!!.snackbar.setText(text)
-            if(isStorageFragmenting(this, Files.getInternalDirectory())) {
-                spaceLeftSnackbar!!.setColor(R.color.colorError)
-            } else {
-                spaceLeftSnackbar!!.resetColor()
-            }
+        val available = Files.availableSpaceInternalPercentage
+        if(available > 0.20) {
+            spaceLeftSnackbar?.dismiss()
+            spaceLeftSnackbar = null
+            return
         }
 
-        spaceLeftSnackbar!!.snackbar.show()
+        val isFragmenting = isStorageFragmenting(this, Files.getInternalDirectory())
+
+        val text =
+            if(!isFragmenting) R.string.going_low
+            else R.string.no_space
+
+        if(spaceLeftSnackbar == null) {
+            spaceLeftSnackbar = Snackbar.make(filesRecyclerView, text, Snackbar.LENGTH_INDEFINITE)
+        } else {
+            spaceLeftSnackbar!!.setText(text)
+        }
+
+        val color = if(isFragmenting) R.color.colorNoSpace
+                    else R.color.colorLowSpace
+
+        spaceLeftSnackbar!!.setColor(color)
+
+        spaceLeftSnackbar!!.show()
     }
 
     val LIST_STATE_KEY = "liststate"

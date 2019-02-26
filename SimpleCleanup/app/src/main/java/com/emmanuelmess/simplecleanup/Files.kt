@@ -137,7 +137,7 @@ object Files {
     }
 
     val availableSpaceInternalPercentage: Float get() {
-        return getAvailableInternalMemorySize().toFloat() / getTotalInternalMemorySize().toFloat() * 100
+        return getAvailableInternalMemorySize().toFloat() / getTotalInternalMemorySize().toFloat()
     }
 
     val spaceNeededAlways: Long get() {

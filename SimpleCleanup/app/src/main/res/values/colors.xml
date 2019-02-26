@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorNormalSnackbar">#424242</color>
-    <color name="colorError">#F4511E</color>
+    <color name="colorNoSpace">#B00020</color>
+    <color name="colorLowSpace">#FF9800</color>
 </resources>
