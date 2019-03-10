@@ -7,4 +7,7 @@
     <string name="media">Media</string>
     <string name="no_space">NO SPACE LEFT</string>
     <string name="going_low">LOW ON SPACE</string>
+    <string name="channel_name">Emergency channel</string>
+    <string name="channel_description">This channel is used for emergency reports</string>
+    <string name="open_to_clean">Open to fix!</string>
 </resources>

@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.emmanuelmess.simplecleanup.background.CheckSpaceLeftScheduler
+import com.emmanuelmess.simplecleanup.background.LowSpaceNotification
 import com.emmanuelmess.simplecleanup.extensions.deleteAll
 import com.emmanuelmess.simplecleanup.extensions.setColor
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
@@ -26,12 +28,15 @@ class MainActivity : PermissionsActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        CheckSpaceLeftScheduler(this)
+
         pullToRefresh.setOnRefreshListener {
             refresh()
         }
 
         fab.setOnClickListener {
             handlePermission(WRITE_EXTERNAL_STORAGE) {
+                LowSpaceNotification(this).hide()
                 delete()
             }
         }
@@ -89,6 +94,8 @@ class MainActivity : PermissionsActivity() {
             if (filesByCategory.isNotEmpty()) {
                 refreshInternalStorageLeftSnackbar()
             } else {
+                Preferences.setCurrentSpaceStateAsUpperBound(this)
+
                 spaceLeftSnackbar?.dismiss()
                 spaceLeftSnackbar = null
             }
@@ -105,18 +112,21 @@ class MainActivity : PermissionsActivity() {
             }
         }
 
+        Preferences.setCurrentSpaceStateAsUpperBound(this)
         refreshInternalStorageLeftSnackbar()
     }
 
     private fun refreshInternalStorageLeftSnackbar() {
-        val available = Files.availableSpaceInternalPercentage
-        if(available > 0.20) {
+        val currentSpaceState = getCurrentSpaceState(this)
+        if(currentSpaceState == NORMAL
+            || Preferences.getCurrentSpaceStateUpperBound(this) <= currentSpaceState) {
+
             spaceLeftSnackbar?.dismiss()
             spaceLeftSnackbar = null
             return
         }
 
-        val isFragmenting = isStorageFragmenting(this, Files.getInternalDirectory())
+        val isFragmenting = currentSpaceState > FRAGMENTING
 
         val text =
             if(!isFragmenting) R.string.going_low

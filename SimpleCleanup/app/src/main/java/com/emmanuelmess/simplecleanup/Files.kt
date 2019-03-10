@@ -141,11 +141,11 @@ object Files {
     }
 
     val spaceNeededAlways: Long get() {
-        return (getTotalInternalMemorySize() * 0.10).toLong()
+        return (getTotalInternalMemorySize() * CONSERVATIVE_FRAGMENTATION_THRESHOLD).toLong()
     }
 
     val spaceNeededPreferably: Long get() {
-        return (getTotalInternalMemorySize() * 0.20).toLong()
+        return (getTotalInternalMemorySize() * MIN_NORMAL_FREE_SPACE).toLong()
     }
 
     private fun getAvailableInternalMemorySize(): Long {
