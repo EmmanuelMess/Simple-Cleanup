@@ -10,4 +10,6 @@
     <string name="channel_name">Emergency channel</string>
     <string name="channel_description">This channel is used for emergency reports</string>
     <string name="open_to_clean">Open to fix!</string>
+    <string name="swipe_to_refresh">Swipe down to refresh</string>
+    <string name="we_keep_checking">We\'ll keep checking\nautomagically ;P</string>
 </resources>
