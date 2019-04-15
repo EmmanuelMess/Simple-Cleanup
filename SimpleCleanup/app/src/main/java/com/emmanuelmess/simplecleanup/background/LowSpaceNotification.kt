@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.emmanuelmess.simplecleanup.Files
-import com.emmanuelmess.simplecleanup.MainActivity
+import com.emmanuelmess.simplecleanup.activities.MainActivity
 import com.emmanuelmess.simplecleanup.R
 import com.emmanuelmess.simplecleanup.helpers.isStorageFragmenting
 

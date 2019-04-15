@@ -1,21 +1,25 @@
-package com.emmanuelmess.simplecleanup
+package com.emmanuelmess.simplecleanup.activities
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmanuelmess.simplecleanup.background.CheckSpaceLeftScheduler
 import com.emmanuelmess.simplecleanup.background.LowSpaceNotification
 import com.emmanuelmess.simplecleanup.extensions.deleteAll
 import com.emmanuelmess.simplecleanup.extensions.setColor
 import com.emmanuelmess.simplecleanup.helpers.PermissionsActivity
-import com.emmanuelmess.simplecleanup.helpers.isStorageFragmenting
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.io.File
+import android.view.Menu
+import com.emmanuelmess.simplecleanup.*
 
 class MainActivity : PermissionsActivity() {
 
@@ -144,6 +148,20 @@ class MainActivity : PermissionsActivity() {
         spaceLeftSnackbar!!.setColor(color)
 
         spaceLeftSnackbar!!.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.appbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_patreonlist -> {
+            startActivity(Intent(applicationContext, PatreonsListActivity::class.java))
+            true
+        }
+
+        else -> super.onOptionsItemSelected(item)
     }
 
     val LIST_STATE_KEY = "liststate"

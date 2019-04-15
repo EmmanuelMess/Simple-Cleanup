@@ -12,4 +12,8 @@
     <string name="open_to_clean">Open to fix!</string>
     <string name="swipe_to_refresh">Swipe down to refresh</string>
     <string name="we_keep_checking">We\'ll keep checking\nautomagically ;P</string>
+    <string name="title_activity_patreons_list">Awesome people!</string>
+    <string name="large_text">
+        "Alfred"
+    </string>
 </resources>
