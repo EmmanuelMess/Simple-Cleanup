@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_features"
+        android:icon="@drawable/ic_favorite_border_white_24dp"
+        android:title="Support development"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_patreonlist"
         android:icon="@drawable/ic_patreon_white"
         android:title="Patreon supporters"

@@ -2,6 +2,7 @@ package com.emmanuelmess.simplecleanup.activities
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -19,6 +20,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.io.File
 import android.view.Menu
+import com.emmanuelmess.featurepurchaselibrary.ArgumentConstants
+import com.emmanuelmess.featurepurchaselibrary.FeaturePurchaseActivity
 import com.emmanuelmess.simplecleanup.*
 
 class MainActivity : PermissionsActivity() {
@@ -156,12 +159,29 @@ class MainActivity : PermissionsActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_features -> {
+            startActivity(Intent(applicationContext, FeaturePurchaseActivity::class.java).apply {
+                putExtra(ArgumentConstants.ACTIVITY_CLASS_STRING, MainActivity::class.java.name)
+                putExtra(ArgumentConstants.ACTIVITY_NAME_STRING, getString(R.string.app_name))
+                putExtra(ArgumentConstants.BUY_CLASS_NAME_STRING, MainActivity::class.java.name)
+                putExtra(ArgumentConstants.BUY_METHOD_NAME_STRING, (MainActivity)::onClickBuy.name)
+                putExtra(ArgumentConstants.PRICE_FLOAT, 0.35f)
+                putExtra(ArgumentConstants.FEATURES_STRING_LIST, arrayListOf("Move files", "Priority support"))
+            })
+            true
+        }
         R.id.action_patreonlist -> {
             startActivity(Intent(applicationContext, PatreonsListActivity::class.java))
             true
         }
-
         else -> super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        @JvmStatic
+        fun onClickBuy(context: Context) {
+
+        }
     }
 
     val LIST_STATE_KEY = "liststate"
